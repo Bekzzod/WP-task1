@@ -7,22 +7,35 @@ var allUsers = [
 var allRights = ["manage content", "play games", "delete users", "view site"];
 
 var allGroups = {
-	"admin": [rights[2]],
-	"manager": [rights[0]],
-	"basic": [rights[1], rights[3]]
+	"admin": [allRights[2]],
+	"manager": [allRights[0]],
+	"basic": [allRights[1], allRights[3]]
 }
 
 function createUser(nick, pass) {
-	allUsers.push({nickname: nick, password: pass, groups: ["basic"]});
+	if (typeof(nick) == "string" && typeof(pass) == "string") {
+		var len = allUsers.push({nickname: nick, password: pass, groups: ["basic"]});
 
-	return allUsers[allUsers.length - 1];
+		return allUsers[len - 1];
+	}
 };
 
-function deleteUser(nick) {
-	for (var i = 0; i < allUsers.length; i++) {
-		if (Object.values(allUsers[i]).indexOf(nick) > -1) {
-			allUsers.splice(i, 1);
+function deleteUser(user) {
+	if (user != null) {
+		var found = false;
+
+		for(var i = 0; i < allUsers.length; i++) {
+			if (allUsers[i] === user) {
+				allUsers.splice(i, 1);
+				found = true;
+			}
 		}
+		if (found == false){
+			throw new Error('сообщение, описывающее возникшую ошибку');
+		}
+	}
+	else {
+		throw new Error('сообщение, описывающее возникшую ошибку');
 	}
 };
 
@@ -32,23 +45,77 @@ function users() {
 
 function createGroup() {};
 
-function deleteGroup() {};
+function deleteGroup(group) {
+	if (group != null) {
+		var groups = Object.keys(allGroups);
+		var isExist = groups.indexOf(group);
 
-function groups() {};
+		if ( isExist != -1) {
+			delete allGroups[group];
+		}
+	}
+	else {
+		throw new Error('сообщение, описывающее возникшую ошибку')
+	}
+};
 
-function addUserToGroup() {};
+function groups() {
+	return Object.values(allGroups);
+};
 
-function userGroups() {};
+function addUserToGroup(nick, group) {
+
+};
+
+function userGroups(nick) {
+	for(var i = 0; i < allUsers.length; i++) {
+		if (allUsers[i].nickname === nick) {
+			return allUsers[i].groups;
+		}
+		else {
+			return [];
+		}
+	}
+};
 
 function removeUserFromGroup() {};
 
-function createRight() {};
+function createRight(right) {
+	if (right != null) {
+		var len = allRights.push(right);
+		
+		return allRights[len - 1];
+		}
+};
 
-function deleteRight() {};
+function deleteRight(right) {
+	if (right != null) {
+		var isExist = allRights.indexOf(right);
 
-function groupRights() {};
+		if ( isExist != -1) {
+			allRights.splice(isExist, 1);
+		}
+	}
+	else {
+		throw new Error('сообщение, описывающее возникшую ошибку')
+	}
+};
 
-function rights() {};
+function groupRights(group) {
+	var groups = Object.keys(allGroups);
+	var isExist = groups.indexOf(group);
+
+	if ( isExist != -1) {
+		return allGroups[group];
+	}
+	else {
+		return [];
+	}
+};
+
+function rights() {
+	return allRights;
+};
 
 function addRightToGroup() {};
 

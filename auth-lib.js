@@ -6,11 +6,14 @@ var allUsers = [
 
 var allRights = ["manage content", "play games", "delete users", "view site"];
 
-var allGroups = {
-	"admin": [allRights[2]],
-	"manager": [allRights[0]],
-	"basic": [allRights[1], allRights[3]]
-}
+var allGroups = [
+	{name: "admin", rights: [allRights[2]]},
+	{name: "manager", rights: [allRights[0]]},
+	{name: "basic", rights: [allRights[1], allRights[3]]}
+]
+
+var sessionCreated = false;
+var sessionUser;
 
 function createUser(nick, pass) {
 	if (typeof(nick) == "string" && typeof(pass) == "string") {
@@ -31,11 +34,11 @@ function deleteUser(user) {
 			}
 		}
 		if (found == false){
-			throw new Error('сообщение, описывающее возникшую ошибку');
+			throw new Error('должна бросить исключение, если ей передали уже удаленн(ого/ое/ую) user');
 		}
 	}
 	else {
-		throw new Error('сообщение, описывающее возникшую ошибку');
+		throw new Error('должна бросить исключение, если ей передали плохой аргумент');
 	}
 };
 
@@ -43,33 +46,84 @@ function users() {
 	return allUsers;
 };
 
-function createGroup() {};
+function createGroup() {
+	var text = "";
+	var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+	for (var i = 0; i < 7; i++) {
+		text += possible.charAt(Math.floor(Math.random() * possible.length));
+	}
+
+	var rndRigth = Math.floor(Math.random() * allRights.length); 
+
+	var len = allGroups.push({name: text, rights: undefined});
+	return allGroups[len - 1];
+};
 
 function deleteGroup(group) {
 	if (group != null) {
-		var groups = Object.keys(allGroups);
-		var isExist = groups.indexOf(group);
+		var found = false;
 
-		if ( isExist != -1) {
-			delete allGroups[group];
+		for(var i = 0; i < allGroups.length; i++) {
+			if (allGroups[i] === group) {
+				delete allGroups[i];
+				found = true;
+			}
+		}
+		if (found == false) {
+			throw new Error('сообщение, описывающее возникшую ошибку')
 		}
 	}
 	else {
-		throw new Error('сообщение, описывающее возникшую ошибку')
+		throw new Error('должна бросить исключение, если ей передали плохой аргумент');
 	}
 };
 
 function groups() {
-	return Object.values(allGroups);
+	return allGroups;
 };
 
-function addUserToGroup(nick, group) {
+function addUserToGroup(user, group) {
+	if (user != null && group != null) {
+		var foundUser = false;
+		var foundGroup = false;
+		var foundUserGroup = false;
+		var id;
 
+		for(var i = 0; i < allUsers.length; i++) {
+			if (allUsers[i] === user) {
+				foundUser = true;
+				id = i;
+			}
+		}
+		for(var i = 0; i < allGroups.length; i++) {
+			if (allGroups[i] === group) {
+				foundGroup = true;
+			}
+		}
+
+		if (foundUser == true && foundGroup == true) {
+			for(var i = 0; i < allUsers[id].groups.length; i++) {
+				if (allUsers[id].groups[i] === group.name) {
+					foundUserGroup = true;
+				}
+			}
+			if (foundUserGroup == false) {
+				allUsers[id].groups.push(group.name);
+			}
+		}
+		else {
+			throw new Error('должна бросить исключение, если ей передали что-то удаленное');
+		}
+	}
+	else {
+		throw new Error('должна бросить исключение, если ей передали плохой аргумент');
+	}
 };
 
-function userGroups(nick) {
+function userGroups(user) {
 	for(var i = 0; i < allUsers.length; i++) {
-		if (allUsers[i].nickname === nick) {
+		if (allUsers[i] === user) {
 			return allUsers[i].groups;
 		}
 		else {
@@ -78,14 +132,56 @@ function userGroups(nick) {
 	}
 };
 
-function removeUserFromGroup() {};
+function removeUserFromGroup(user, group) {
+	if (user != null  && group != null) {
+		var foundUser = false;
+		var foundGroup = false;
+		var foundUserGroup = false;
+		var id;
 
-function createRight(right) {
-	if (right != null) {
-		var len = allRights.push(right);
-		
-		return allRights[len - 1];
+		for(var i = 0; i < allUsers.length; i++) {
+			if (allUsers[i] === user) {
+				foundUser = true;
+				id = i;
+			}
 		}
+		for(var i = 0; i < allGroups.length; i++) {
+			if (allGroups[i] === group) {
+				foundGroup = true;
+			}
+		}
+
+		if (foundUser == true && foundGroup == true) {
+			for(var i = 0; i < allUsers[id].groups.length; i++) {
+				if (allUsers[id].groups[i] === group.name) {
+					allUsers[id].groups.splice(i, 1);
+					foundUserGroup = true;
+				}
+			}
+			if (foundUserGroup == false) {
+				throw new Error('должна должна бросить исключение при попытке удалить user из группы, которого там нет')
+			}
+		}
+		else {
+			throw new Error('сообщение, описывающее возникшую ошибку');
+		}
+	}
+	else {
+		throw new Error('должна бросить исключение, если ей передали плохой аргумент');
+	}
+};
+
+function createRight() {
+	var text = "";
+	var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+	for (var i = 0; i < 7; i++) {
+		text += possible.charAt(Math.floor(Math.random() * possible.length));
+	}
+
+	var len = allRights.push(text);
+
+	return allRights[len - 1];
 };
 
 function deleteRight(right) {
@@ -95,9 +191,12 @@ function deleteRight(right) {
 		if ( isExist != -1) {
 			allRights.splice(isExist, 1);
 		}
+		else {
+			throw new Error('должна бросить исключение, если ей передали уже удаленн(ого/ое/ую) right')
+		}
 	}
 	else {
-		throw new Error('сообщение, описывающее возникшую ошибку')
+		throw new Error('должна бросить исключение, если ей передали плохой аргумент')
 	}
 };
 
@@ -117,13 +216,112 @@ function rights() {
 	return allRights;
 };
 
-function addRightToGroup() {};
+function addRightToGroup(right, group) {
+	if (right != null && group != null) {
+		var foundRight = false;
+		var foundGroup = false;
+		var foundRigthGroup = false;
+		var idRight;
+		var idGroup;
 
-function removeRightFromGroup() {};
+		for(var i = 0; i < allRights.length; i++) {
+			if (allRights[i] === right) {
+				foundRight = true;
+				idRight = i;
+			}
+		}
+		for(var i = 0; i < allGroups.length; i++) {
+			if (allGroups[i] === group) {
+				foundGroup = true;
+				idGroup = i;
+			}
+		}
 
-function login(username, password) {};
+		if (foundRight == true && foundGroup == true) {
+			if (allGroups[idGroup].rights != undefined) {
+				if (allGroups[idGroup].rights.includes(allRights[idRight])) {
+					foundRigthGroup = true;
+				}
+			}
+			else {
+				allGroups[idGroup].rights = [allRights[idRight]];
+				foundRigthGroup = true;
+			}
+			if (foundRigthGroup == false ) {
+				allGroups[idGroup].rights.push(allRights[idRight]);
+			}
+		}
+		else {
+			throw new Error('должна бросить исключение, если ей передали что-то удаленное')
+		}
+	}
+	else {
+		throw new Error('должна бросить исключение, если ей передали плохой аргумент')
+	}
+};
 
-function currentUser() {};
+function removeRightFromGroup(right, group) {
+	if (right != null && group != null) {
+		var foundRight = false;
+		var foundGroup = false;
+		var foundRigthGroup = false;
+		var idRight;
+		var idGroup;
+
+		for(var i = 0; i < allRights.length; i++) {
+			if (allRights[i] === right) {
+				foundRight = true;
+				idRight = i;
+			}
+		}
+		for(var i = 0; i < allGroups.length; i++) {
+			if (allGroups[i] === group) {
+				foundGroup = true;
+				idGroup = i;
+			}
+		}
+		if (foundRight == true && foundGroup == true) {
+			if (allGroups[idGroup].rights !== undefined) {
+				for (var i = 0; i < allGroups[idGroup].rights.length; i++) {
+					if (allGroups[idGroup].rights[i] === right) {
+						allGroups[idGroup].rights.splice(i, 1);
+						foundRigthGroup = true;
+					}
+				}
+			}
+			if (foundRigthGroup == false) {
+				throw new Error('должна должна бросить исключение при попытке удалить right из группы, которого там нет');
+			}
+		}
+		else {
+			throw new Error('должна бросить исключение, если ей передали что-то удаленное');
+		}
+	}
+	else {
+		throw new Error('должна бросить исключение, если ей передали плохой аргумент');
+	}
+};
+
+function login(username, password) {
+	if (typeof(username) == 'string' && typeof(password) == 'string') {
+		if (sessionCreated == false) {
+			for (var i = 0; i < allUsers.length; i++) {
+				if (allUsers[i].nickname === username && allUsers[i].password === password) {
+					sessionCreated = true;
+					sessionUser = allUsers[i];
+					return true;
+				}
+				else {
+					return false;
+				}
+			}
+		}
+	}
+};
+
+function currentUser() {
+	return sessionUser;
+};
 
 function logout() {};
 

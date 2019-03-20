@@ -94,11 +94,13 @@ function addUserToGroup(user, group) {
 			if (allUsers[i] === user) {
 				foundUser = true;
 				id = i;
+				break;
 			}
 		}
 		for(var i = 0; i < allGroups.length; i++) {
 			if (allGroups[i] === group) {
 				foundGroup = true;
+				break;
 			}
 		}
 
@@ -143,11 +145,13 @@ function removeUserFromGroup(user, group) {
 			if (allUsers[i] === user) {
 				foundUser = true;
 				id = i;
+				break;
 			}
 		}
 		for(var i = 0; i < allGroups.length; i++) {
 			if (allGroups[i] === group) {
 				foundGroup = true;
+				break;
 			}
 		}
 
@@ -228,12 +232,14 @@ function addRightToGroup(right, group) {
 			if (allRights[i] === right) {
 				foundRight = true;
 				idRight = i;
+				break;
 			}
 		}
 		for(var i = 0; i < allGroups.length; i++) {
 			if (allGroups[i] === group) {
 				foundGroup = true;
 				idGroup = i;
+				break;
 			}
 		}
 
@@ -265,19 +271,19 @@ function removeRightFromGroup(right, group) {
 		var foundRight = false;
 		var foundGroup = false;
 		var foundRigthGroup = false;
-		var idRight;
 		var idGroup;
 
 		for(var i = 0; i < allRights.length; i++) {
 			if (allRights[i] === right) {
 				foundRight = true;
-				idRight = i;
+				break;
 			}
 		}
 		for(var i = 0; i < allGroups.length; i++) {
 			if (allGroups[i] === group) {
 				foundGroup = true;
 				idGroup = i;
+				break;
 			}
 		}
 		if (foundRight == true && foundGroup == true) {
@@ -309,12 +315,17 @@ function login(username, password) {
 				if (allUsers[i].nickname === username && allUsers[i].password === password) {
 					sessionCreated = true;
 					sessionUser = allUsers[i];
-					return true;
-				}
-				else {
-					return false;
 				}
 			}
+			if (sessionCreated){
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+		else {
+			return false;
 		}
 	}
 };
@@ -323,6 +334,62 @@ function currentUser() {
 	return sessionUser;
 };
 
-function logout() {};
+function logout() {
+	sessionUser = undefined;
+	sessionCreated = false;
+};
 
-function isAuthorized(user, right) {};
+function isAuthorized(user, right) {
+	if (user != null && right != null) {
+		var foundUser = false;
+		var foundRight = false;
+		var idUser;
+		var groupsWithRight = [];
+
+		for (var i = 0; i < allUsers.length; i++){
+			if (allUsers[i] === user) {
+				foundUser = true;
+				idUser = i;
+				break;
+			}
+		}
+
+		for (var i = 0; i < allRights.length; i++){
+			if (allRights[i] === right) {
+				foundRight = true;
+				break;
+			}
+		}
+
+		for (var i = 0; i < allGroups.length; i++){
+			if (allGroups[i] != undefined) {
+				if (allGroups[i].rights != undefined) {
+					if (allGroups[i].rights.includes(right)) {
+						groupsWithRight.push(allGroups[i].name);
+					}
+				}
+			}
+		}
+
+		if (foundUser == true && foundRight == true) {
+			if (groupsWithRight.length > 0) {
+				var foundUserRight = allUsers[idUser].groups.some(elem => groupsWithRight.indexOf(elem) != -1);
+				if (foundUserRight == true){ 
+					return true;
+				}
+				else {
+					return false;
+				}
+			}
+			else {
+				return false;
+			}
+		}
+		else {
+			throw new Error('функция isAuthorized должна бросать исключения, когда либо пользователь, либо право было удалено');
+		}
+	}
+	else {
+		throw new Error('функция isAuthorized должна бросать исключения, когда её вызывают с плохими аргументами');
+	}
+};

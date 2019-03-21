@@ -1,20 +1,3 @@
-var allUsers = [{
-		nickname: "admin",
-		password: "1234",
-		groups: ["admin", "manager", "basic"]
-	},
-	{
-		nickname: "sobakajozhec",
-		password: "ekh228",
-		groups: ["basic", "manager"]
-	},
-	{
-		nickname: "patriot007",
-		password: "russiaFTW",
-		groups: ["basic"]
-	}
-];
-
 var allRights = ["manage content", "play games", "delete users", "view site"];
 
 var allGroups = [{
@@ -31,6 +14,23 @@ var allGroups = [{
 	}
 ]
 
+var allUsers = [{
+		nickname: "admin",
+		password: "1234",
+		groups: [allGroups[0], allGroups[1], allGroups[2]]
+	},
+	{
+		nickname: "sobakajozhec",
+		password: "ekh228",
+		groups: [allGroups[2], allGroups[1]]
+	},
+	{
+		nickname: "patriot007",
+		password: "russiaFTW",
+		groups: [allGroups[2]]
+	}
+];
+
 var sessionCreated = false;
 var sessionUser;
 
@@ -39,7 +39,7 @@ function createUser(nick, pass) {
 		var len = allUsers.push({
 			nickname: nick,
 			password: pass,
-			groups: ["basic"]
+			groups: [allGroups[2]]
 		});
 
 		return allUsers[len - 1];
@@ -93,6 +93,12 @@ function deleteGroup(group) {
 			if (allGroups[i] === group) {
 				delete allGroups[i];
 				found = true;
+
+				for (var j = 0; j < allUsers.length; j++) {
+					if (allUsers[j].groups.indexOf(group) != -1) {
+						allUsers[j].groups.splice(allUsers[j].groups.indexOf(group), 1);
+					}
+				}
 			}
 		}
 		if (found == false) {
@@ -112,12 +118,12 @@ function addUserToGroup(user, group) {
 		var foundUser = false;
 		var foundGroup = false;
 		var foundUserGroup = false;
-		var id;
+		var idUser;
 
 		for (var i = 0; i < allUsers.length; i++) {
 			if (allUsers[i] === user) {
 				foundUser = true;
-				id = i;
+				idUser = i;
 				break;
 			}
 		}
@@ -129,13 +135,11 @@ function addUserToGroup(user, group) {
 		}
 
 		if (foundUser == true && foundGroup == true) {
-			for (var i = 0; i < allUsers[id].groups.length; i++) {
-				if (allUsers[id].groups[i] === group.name) {
-					foundUserGroup = true;
-				}
+			if (allUsers[idUser].groups.indexOf(group) != -1) {
+				foundUserGroup = true;
 			}
 			if (foundUserGroup == false) {
-				allUsers[id].groups.push(group.name);
+				allUsers[idUser].groups.push(group);
 			}
 		} else {
 			throw new Error('должна бросить исключение, если ей передали что-то удаленное');
@@ -146,12 +150,16 @@ function addUserToGroup(user, group) {
 };
 
 function userGroups(user) {
+	var foundUser = false;
+
 	for (var i = 0; i < allUsers.length; i++) {
 		if (allUsers[i] === user) {
 			return allUsers[i].groups;
-		} else {
-			return [];
+			foundUser = true;
 		}
+	}
+	if (foundUser == false) {
+		return [];
 	}
 };
 
@@ -178,7 +186,7 @@ function removeUserFromGroup(user, group) {
 
 		if (foundUser == true && foundGroup == true) {
 			for (var i = 0; i < allUsers[id].groups.length; i++) {
-				if (allUsers[id].groups[i] === group.name) {
+				if (allUsers[id].groups[i] === group) {
 					allUsers[id].groups.splice(i, 1);
 					foundUserGroup = true;
 				}
@@ -213,6 +221,14 @@ function deleteRight(right) {
 
 		if (isExist != -1) {
 			allRights.splice(isExist, 1);
+
+			for (var j = 0; j < allGroups.length; j++) {
+				if (allGroups[j] != undefined && allGroups[j].rights != undefined) {
+					if (allGroups[j].rights.indexOf(right) != -1) {
+						allGroups[j].rights.splice(allGroups[j].rights.indexOf(right), 1);
+					}
+				}
+			}
 		} else {
 			throw new Error('должна бросить исключение, если ей передали уже удаленн(ого/ое/ую) right')
 		}
@@ -222,12 +238,17 @@ function deleteRight(right) {
 };
 
 function groupRights(group) {
-	var groups = Object.keys(allGroups);
-	var isExist = groups.indexOf(group);
+	var foundRight = false;
 
-	if (isExist != -1) {
-		return allGroups[group];
-	} else {
+	for (var i = 0; i < allGroups.length; i++) {
+		if (allGroups[i] === group) {
+			if (allGroups[i].rights != undefined) {
+				return allGroups[i].rights;
+				foundRight = true;
+			}
+		}
+	}
+	if (foundRight == false) {
 		return [];
 	}
 };
@@ -374,7 +395,7 @@ function isAuthorized(user, right) {
 			if (allGroups[i] != undefined) {
 				if (allGroups[i].rights != undefined) {
 					if (allGroups[i].rights.includes(right)) {
-						groupsWithRight.push(allGroups[i].name);
+						groupsWithRight.push(allGroups[i]);
 					}
 				}
 			}

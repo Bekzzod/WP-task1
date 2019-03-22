@@ -72,7 +72,7 @@ function createGroup() {
 	let groupName = "";
 	let possibleLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
-	for (var i = 0; i < 7; i++) {
+	for (let i = 0; i < 10; i++) {
 		groupName += possibleLetters.charAt(Math.floor(Math.random() * possibleLetters.length));
 	}
 
@@ -92,7 +92,7 @@ function deleteGroup(group) {
 				allGroups.splice(i, 1);
 				foundGroup = true;
 
-				for (var j = 0; j < allUsers.length; j++) {
+				for (let j = 0; j < allUsers.length; j++) {
 					if (allUsers[j].groups.indexOf(group) != -1) {
 						allUsers[j].groups.splice(allUsers[j].groups.indexOf(group), 1);
 					}
@@ -202,9 +202,9 @@ function removeUserFromGroup(user, group) {
 
 function createRight() {
 	let rightName = "";
-	let possibleLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+	let possibleLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
-	for (let i = 0; i < 7; i++) {
+	for (let i = 0; i < 10; i++) {
 		rightName += possibleLetters.charAt(Math.floor(Math.random() * possibleLetters.length));
 	}
 

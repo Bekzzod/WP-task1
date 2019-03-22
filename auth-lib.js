@@ -39,7 +39,7 @@ function createUser(nick, pass) {
 		var len = allUsers.push({
 			nickname: nick,
 			password: pass,
-			groups: [allGroups[2]]
+			groups: []
 		});
 
 		return allUsers[len - 1];
@@ -57,10 +57,10 @@ function deleteUser(user) {
 			}
 		}
 		if (found == false) {
-			throw new Error('должна бросить исключение, если ей передали уже удаленн(ого/ое/ую) user');
+			throw new Error('Передали уже удаленн(ого/ое/ую) user');
 		}
 	} else {
-		throw new Error('должна бросить исключение, если ей передали плохой аргумент');
+		throw new Error('Передали плохой аргумент');
 	}
 };
 
@@ -80,7 +80,7 @@ function createGroup() {
 
 	var len = allGroups.push({
 		name: text,
-		rights: undefined
+		rights: []
 	});
 	return allGroups[len - 1];
 };
@@ -91,7 +91,7 @@ function deleteGroup(group) {
 
 		for (var i = 0; i < allGroups.length; i++) {
 			if (allGroups[i] === group) {
-				delete allGroups[i];
+				allGroups.splice(i, 1);
 				found = true;
 
 				for (var j = 0; j < allUsers.length; j++) {
@@ -102,10 +102,10 @@ function deleteGroup(group) {
 			}
 		}
 		if (found == false) {
-			throw new Error('сообщение, описывающее возникшую ошибку')
+			throw new Error('Передали уже удаленн(ого/ое/ую) group')
 		}
 	} else {
-		throw new Error('должна бросить исключение, если ей передали плохой аргумент');
+		throw new Error('Передали плохой аргумент');
 	}
 };
 
@@ -142,10 +142,10 @@ function addUserToGroup(user, group) {
 				allUsers[idUser].groups.push(group);
 			}
 		} else {
-			throw new Error('должна бросить исключение, если ей передали что-то удаленное');
+			throw new Error('Передали что-то удаленное');
 		}
 	} else {
-		throw new Error('должна бросить исключение, если ей передали плохой аргумент');
+		throw new Error('Передали плохой аргумент');
 	}
 };
 
@@ -154,8 +154,8 @@ function userGroups(user) {
 
 	for (var i = 0; i < allUsers.length; i++) {
 		if (allUsers[i] === user) {
-			return allUsers[i].groups;
 			foundUser = true;
+			return allUsers[i].groups;
 		}
 	}
 	if (foundUser == false) {
@@ -192,13 +192,13 @@ function removeUserFromGroup(user, group) {
 				}
 			}
 			if (foundUserGroup == false) {
-				throw new Error('должна должна бросить исключение при попытке удалить user из группы, которого там нет')
+				throw new Error('Попытка удалить user из группы, которого там нет')
 			}
 		} else {
-			throw new Error('сообщение, описывающее возникшую ошибку');
+			throw new Error('Передали что-то удаленное');
 		}
 	} else {
-		throw new Error('должна бросить исключение, если ей передали плохой аргумент');
+		throw new Error('Передали плохой аргумент');
 	}
 };
 
@@ -230,10 +230,10 @@ function deleteRight(right) {
 				}
 			}
 		} else {
-			throw new Error('должна бросить исключение, если ей передали уже удаленн(ого/ое/ую) right')
+			throw new Error('Передали уже удаленн(ого/ое/ую) right')
 		}
 	} else {
-		throw new Error('должна бросить исключение, если ей передали плохой аргумент')
+		throw new Error('Передали плохой аргумент');
 	}
 };
 
@@ -243,8 +243,8 @@ function groupRights(group) {
 	for (var i = 0; i < allGroups.length; i++) {
 		if (allGroups[i] === group) {
 			if (allGroups[i].rights != undefined) {
-				return allGroups[i].rights;
 				foundRight = true;
+				return allGroups[i].rights;
 			}
 		}
 	}
@@ -282,21 +282,21 @@ function addRightToGroup(right, group) {
 
 		if (foundRight == true && foundGroup == true) {
 			if (allGroups[idGroup].rights != undefined) {
-				if (allGroups[idGroup].rights.includes(allRights[idRight])) {
+				if (allGroups[idGroup].rights.includes(right)) {
 					foundRigthGroup = true;
 				}
 			} else {
-				allGroups[idGroup].rights = [allRights[idRight]];
+				allGroups[idGroup].rights = [right];
 				foundRigthGroup = true;
 			}
 			if (foundRigthGroup == false) {
-				allGroups[idGroup].rights.push(allRights[idRight]);
+				allGroups[idGroup].rights.push(right);
 			}
 		} else {
-			throw new Error('должна бросить исключение, если ей передали что-то удаленное')
+			throw new Error('Передали что-то удаленное')
 		}
 	} else {
-		throw new Error('должна бросить исключение, если ей передали плохой аргумент')
+		throw new Error('Передали плохой аргумент');
 	}
 };
 
@@ -330,13 +330,13 @@ function removeRightFromGroup(right, group) {
 				}
 			}
 			if (foundRigthGroup == false) {
-				throw new Error('должна должна бросить исключение при попытке удалить right из группы, которого там нет');
+				throw new Error('Попытка удалить right из группы, которого там нет');
 			}
 		} else {
-			throw new Error('должна бросить исключение, если ей передали что-то удаленное');
+			throw new Error('Передали что-то удаленное');
 		}
 	} else {
-		throw new Error('должна бросить исключение, если ей передали плохой аргумент');
+		throw new Error('Передали плохой аргумент');
 	}
 };
 
@@ -413,9 +413,9 @@ function isAuthorized(user, right) {
 				return false;
 			}
 		} else {
-			throw new Error('функция isAuthorized должна бросать исключения, когда либо пользователь, либо право было удалено');
+			throw new Error('Либо пользователь, либо право было удалено');
 		}
 	} else {
-		throw new Error('функция isAuthorized должна бросать исключения, когда её вызывают с плохими аргументами');
+		throw new Error('Передали плохой аргумент');
 	}
 };

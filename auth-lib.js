@@ -1,6 +1,6 @@
-var allRights = ["manage content", "play games", "delete users", "view site"];
+let allRights = ["manage content", "play games", "delete users", "view site"];
 
-var allGroups = [{
+let allGroups = [{
 		name: "admin",
 		rights: [allRights[2]]
 	},
@@ -14,7 +14,7 @@ var allGroups = [{
 	}
 ]
 
-var allUsers = [{
+let allUsers = [{
 		nickname: "admin",
 		password: "1234",
 		groups: [allGroups[0], allGroups[1], allGroups[2]]
@@ -31,12 +31,12 @@ var allUsers = [{
 	}
 ];
 
-var sessionCreated = false;
-var sessionUser;
+let sessionCreated = false;
+let sessionUser;
 
 function createUser(nick, pass) {
 	if (typeof (nick) == "string" && typeof (pass) == "string") {
-		var len = allUsers.push({
+		let len = allUsers.push({
 			nickname: nick,
 			password: pass,
 			groups: []
@@ -48,15 +48,15 @@ function createUser(nick, pass) {
 
 function deleteUser(user) {
 	if (user != null) {
-		var found = false;
+		let foundUser = false;
 
-		for (var i = 0; i < allUsers.length; i++) {
+		for (let i = 0; i < allUsers.length; i++) {
 			if (allUsers[i] === user) {
 				allUsers.splice(i, 1);
-				found = true;
+				foundUser = true;
 			}
 		}
-		if (found == false) {
+		if (foundUser == false) {
 			throw new Error('Передали уже удаленн(ого/ое/ую) user');
 		}
 	} else {
@@ -69,17 +69,15 @@ function users() {
 };
 
 function createGroup() {
-	var text = "";
-	var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+	let groupName = "";
+	let possibleLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
 	for (var i = 0; i < 7; i++) {
-		text += possible.charAt(Math.floor(Math.random() * possible.length));
+		groupName += possibleLetters.charAt(Math.floor(Math.random() * possibleLetters.length));
 	}
 
-	var rndRigth = Math.floor(Math.random() * allRights.length);
-
-	var len = allGroups.push({
-		name: text,
+	let len = allGroups.push({
+		name: groupName,
 		rights: []
 	});
 	return allGroups[len - 1];
@@ -87,12 +85,12 @@ function createGroup() {
 
 function deleteGroup(group) {
 	if (group != null) {
-		var found = false;
+		let foundGroup = false;
 
-		for (var i = 0; i < allGroups.length; i++) {
+		for (let i = 0; i < allGroups.length; i++) {
 			if (allGroups[i] === group) {
 				allGroups.splice(i, 1);
-				found = true;
+				foundGroup = true;
 
 				for (var j = 0; j < allUsers.length; j++) {
 					if (allUsers[j].groups.indexOf(group) != -1) {
@@ -101,7 +99,7 @@ function deleteGroup(group) {
 				}
 			}
 		}
-		if (found == false) {
+		if (foundGroup == false) {
 			throw new Error('Передали уже удаленн(ого/ое/ую) group')
 		}
 	} else {
@@ -115,19 +113,19 @@ function groups() {
 
 function addUserToGroup(user, group) {
 	if (user != null && group != null) {
-		var foundUser = false;
-		var foundGroup = false;
-		var foundUserGroup = false;
-		var idUser;
+		let foundUser = false;
+		let foundGroup = false;
+		let foundUserGroup = false;
+		let idUser;
 
-		for (var i = 0; i < allUsers.length; i++) {
+		for (let i = 0; i < allUsers.length; i++) {
 			if (allUsers[i] === user) {
 				foundUser = true;
 				idUser = i;
 				break;
 			}
 		}
-		for (var i = 0; i < allGroups.length; i++) {
+		for (let i = 0; i < allGroups.length; i++) {
 			if (allGroups[i] === group) {
 				foundGroup = true;
 				break;
@@ -150,9 +148,9 @@ function addUserToGroup(user, group) {
 };
 
 function userGroups(user) {
-	var foundUser = false;
+	let foundUser = false;
 
-	for (var i = 0; i < allUsers.length; i++) {
+	for (let i = 0; i < allUsers.length; i++) {
 		if (allUsers[i] === user) {
 			foundUser = true;
 			return allUsers[i].groups;
@@ -165,19 +163,19 @@ function userGroups(user) {
 
 function removeUserFromGroup(user, group) {
 	if (user != null && group != null) {
-		var foundUser = false;
-		var foundGroup = false;
-		var foundUserGroup = false;
-		var id;
+		let foundUser = false;
+		let foundGroup = false;
+		let foundUserGroup = false;
+		let id;
 
-		for (var i = 0; i < allUsers.length; i++) {
+		for (let i = 0; i < allUsers.length; i++) {
 			if (allUsers[i] === user) {
 				foundUser = true;
 				id = i;
 				break;
 			}
 		}
-		for (var i = 0; i < allGroups.length; i++) {
+		for (let i = 0; i < allGroups.length; i++) {
 			if (allGroups[i] === group) {
 				foundGroup = true;
 				break;
@@ -185,7 +183,7 @@ function removeUserFromGroup(user, group) {
 		}
 
 		if (foundUser == true && foundGroup == true) {
-			for (var i = 0; i < allUsers[id].groups.length; i++) {
+			for (let i = 0; i < allUsers[id].groups.length; i++) {
 				if (allUsers[id].groups[i] === group) {
 					allUsers[id].groups.splice(i, 1);
 					foundUserGroup = true;
@@ -203,26 +201,26 @@ function removeUserFromGroup(user, group) {
 };
 
 function createRight() {
-	var text = "";
-	var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+	let rightName = "";
+	let possibleLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
-	for (var i = 0; i < 7; i++) {
-		text += possible.charAt(Math.floor(Math.random() * possible.length));
+	for (let i = 0; i < 7; i++) {
+		rightName += possibleLetters.charAt(Math.floor(Math.random() * possibleLetters.length));
 	}
 
-	var len = allRights.push(text);
+	let len = allRights.push(rightName);
 
 	return allRights[len - 1];
 };
 
 function deleteRight(right) {
 	if (right != null) {
-		var isExist = allRights.indexOf(right);
+		let isExist = allRights.indexOf(right);
 
 		if (isExist != -1) {
 			allRights.splice(isExist, 1);
 
-			for (var j = 0; j < allGroups.length; j++) {
+			for (let j = 0; j < allGroups.length; j++) {
 				if (allGroups[j] != undefined && allGroups[j].rights != undefined) {
 					if (allGroups[j].rights.indexOf(right) != -1) {
 						allGroups[j].rights.splice(allGroups[j].rights.indexOf(right), 1);
@@ -238,9 +236,9 @@ function deleteRight(right) {
 };
 
 function groupRights(group) {
-	var foundRight = false;
+	let foundRight = false;
 
-	for (var i = 0; i < allGroups.length; i++) {
+	for (let i = 0; i < allGroups.length; i++) {
 		if (allGroups[i] === group) {
 			if (allGroups[i].rights != undefined) {
 				foundRight = true;
@@ -259,20 +257,18 @@ function rights() {
 
 function addRightToGroup(right, group) {
 	if (right != null && group != null) {
-		var foundRight = false;
-		var foundGroup = false;
-		var foundRigthGroup = false;
-		var idRight;
-		var idGroup;
+		let foundRight = false;
+		let foundGroup = false;
+		let foundRigthGroup = false;
+		let idGroup;
 
-		for (var i = 0; i < allRights.length; i++) {
+		for (let i = 0; i < allRights.length; i++) {
 			if (allRights[i] === right) {
 				foundRight = true;
-				idRight = i;
 				break;
 			}
 		}
-		for (var i = 0; i < allGroups.length; i++) {
+		for (let i = 0; i < allGroups.length; i++) {
 			if (allGroups[i] === group) {
 				foundGroup = true;
 				idGroup = i;
@@ -302,18 +298,18 @@ function addRightToGroup(right, group) {
 
 function removeRightFromGroup(right, group) {
 	if (right != null && group != null) {
-		var foundRight = false;
-		var foundGroup = false;
-		var foundRigthGroup = false;
-		var idGroup;
+		let foundRight = false;
+		let foundGroup = false;
+		let foundRigthGroup = false;
+		let idGroup;
 
-		for (var i = 0; i < allRights.length; i++) {
+		for (let i = 0; i < allRights.length; i++) {
 			if (allRights[i] === right) {
 				foundRight = true;
 				break;
 			}
 		}
-		for (var i = 0; i < allGroups.length; i++) {
+		for (let i = 0; i < allGroups.length; i++) {
 			if (allGroups[i] === group) {
 				foundGroup = true;
 				idGroup = i;
@@ -322,7 +318,7 @@ function removeRightFromGroup(right, group) {
 		}
 		if (foundRight == true && foundGroup == true) {
 			if (allGroups[idGroup].rights !== undefined) {
-				for (var i = 0; i < allGroups[idGroup].rights.length; i++) {
+				for (let i = 0; i < allGroups[idGroup].rights.length; i++) {
 					if (allGroups[idGroup].rights[i] === right) {
 						allGroups[idGroup].rights.splice(i, 1);
 						foundRigthGroup = true;
@@ -343,7 +339,7 @@ function removeRightFromGroup(right, group) {
 function login(username, password) {
 	if (typeof (username) == 'string' && typeof (password) == 'string') {
 		if (sessionCreated == false) {
-			for (var i = 0; i < allUsers.length; i++) {
+			for (let i = 0; i < allUsers.length; i++) {
 				if (allUsers[i].nickname === username && allUsers[i].password === password) {
 					sessionCreated = true;
 					sessionUser = allUsers[i];
@@ -371,12 +367,12 @@ function logout() {
 
 function isAuthorized(user, right) {
 	if (user != null && right != null) {
-		var foundUser = false;
-		var foundRight = false;
-		var idUser;
-		var groupsWithRight = [];
+		let foundUser = false;
+		let foundRight = false;
+		let idUser;
+		let groupsWithRight = [];
 
-		for (var i = 0; i < allUsers.length; i++) {
+		for (let i = 0; i < allUsers.length; i++) {
 			if (allUsers[i] === user) {
 				foundUser = true;
 				idUser = i;
@@ -384,14 +380,14 @@ function isAuthorized(user, right) {
 			}
 		}
 
-		for (var i = 0; i < allRights.length; i++) {
+		for (let i = 0; i < allRights.length; i++) {
 			if (allRights[i] === right) {
 				foundRight = true;
 				break;
 			}
 		}
 
-		for (var i = 0; i < allGroups.length; i++) {
+		for (let i = 0; i < allGroups.length; i++) {
 			if (allGroups[i] != undefined) {
 				if (allGroups[i].rights != undefined) {
 					if (allGroups[i].rights.includes(right)) {
@@ -403,7 +399,7 @@ function isAuthorized(user, right) {
 
 		if (foundUser == true && foundRight == true) {
 			if (groupsWithRight.length > 0) {
-				var foundUserRight = allUsers[idUser].groups.some(elem => groupsWithRight.indexOf(elem) != -1);
+				let foundUserRight = allUsers[idUser].groups.some(elem => groupsWithRight.indexOf(elem) != -1);
 				if (foundUserRight == true) {
 					return true;
 				} else {
